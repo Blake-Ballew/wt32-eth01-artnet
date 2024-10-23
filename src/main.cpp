@@ -93,15 +93,14 @@ void setup() {
   ETH.setHostname("obelisk-control-board-1");
 
   // reciever size (NUM_LEDS * 3), NUM_LEDS = 144*6
-  uint32_t data_size = UNIVERSE_SIZE_IN_CHANNEL * NUMSTRIPS_PER_PIN;
+  // 12 universes of data?
+  uint32_t data_size = (170 * 3) * 12;
 
   // Universes 1-6 go to GPIO pin 14
-  artnet.addSubArtnet(1, data_size, UNIVERSE_SIZE_IN_CHANNEL ,&artnetCallbackPin14);
+  artnet.addSubArtnet(1, data_size, 170 ,&artnetCallbackPin14);
 
-  // Universes 7 - 12 go to GPIO pin 15
-  artnet.addSubArtnet(7, data_size, UNIVERSE_SIZE_IN_CHANNEL ,&artnetCallbackPin15);
-
-
+  // // Universes 7 - 12 go to GPIO pin 15
+  // artnet.addSubArtnet(7, data_size, UNIVERSE_SIZE_IN_CHANNEL ,&artnetCallbackPin15);
 
   artnet.setNodeName("SIGMA v4.20 OBAMA SIGNATURE EDITION (brain smoothed firmware v666)");
 
