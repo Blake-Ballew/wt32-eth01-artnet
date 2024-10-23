@@ -41,7 +41,7 @@ void setup() {
   if (artnet.listen(6454)) 
   {
       Serial.print("artnet Listening on IP: ");
-      Serial.println(WiFi.localIP());
+      Serial.println(ETH.localIP()); 
   }
 }
 
