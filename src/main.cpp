@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <FastLED.h>
 #include <ETH.h>
+#include <ArtnetETH.h>
 
 #define NUM_LEDS_PER_STRIP 144 // Modulight V3 Spec
 #define NUMSTRIPS 12 // 12 per controller
@@ -13,9 +14,11 @@
 #define NB_LEDS_PER_UNIVERSE 144
 #define START_UNIVERSE 1
 
-#include "artnetESP32V2.h"
+// #include "artnetESP32V2.h"
 
-artnetESP32V2 artnet;
+// artnetESP32V2 artnet;
+
+ArtnetReceiver artnet;
 
 CRGB *ledsPin14;
 CRGB *ledsPin15;
@@ -23,59 +26,65 @@ CRGB *ledsPin15;
 // I2SClocklessLedDriver driver;
 // int pins[]={14};
 
-void artnetCallbackPin14(void *param)
+void artnetCallback(const uint8_t *data, uint16_t size, const ArtDmxMetadata &metadata, const ArtNetRemoteInfo &remote)
 {
-  subArtnet *subartnet = (subArtnet *)param;
-  auto dataLen = subartnet->len;
 
-  Serial.println("artnet callback 14: ");
-  Serial.print("dataLen: ");
-  Serial.println(dataLen);
-  Serial.print("Start Universe: ");
-  Serial.println(subartnet->startUniverse);
-  Serial.print("End Universe: ");
-  Serial.println(subartnet->endUniverse);
-  Serial.print("Universe data size: ");
-  Serial.println(subartnet->nbDataPerUniverse);
-
-  for (int i = 0; i < dataLen; i += NB_CHANNEL_PER_LED)
-  {
-    size_t ledIdx = i / NB_CHANNEL_PER_LED;
-    ledsPin14[ledIdx] = CRGB(subartnet->data[i], subartnet->data[i + 1], subartnet->data[i + 2]);
-  }
-
-  FastLED.show();
 }
 
-void artnetCallbackPin15(void *param)
-{
-  subArtnet *subartnet = (subArtnet *)param;
-  auto dataLen = subartnet->len;
+// void artnetCallbackPin14(void *param)
+// {
+//   subArtnet *subartnet = (subArtnet *)param;
+//   auto dataLen = subartnet->len;
 
-  Serial.println("artnet callback 14: ");
-  Serial.print("dataLen: ");
-  Serial.println(dataLen);
-  Serial.print("Start Universe: ");
-  Serial.println(subartnet->startUniverse);
-  Serial.print("End Universe: ");
-  Serial.println(subartnet->endUniverse);
-  Serial.print("Universe data size: ");
-  Serial.println(subartnet->nbDataPerUniverse);
+//   Serial.println("artnet callback 14: ");
+//   Serial.print("dataLen: ");
+//   Serial.println(dataLen);
+//   Serial.print("Start Universe: ");
+//   Serial.println(subartnet->startUniverse);
+//   Serial.print("End Universe: ");
+//   Serial.println(subartnet->endUniverse);
+//   Serial.print("Universe data size: ");
+//   Serial.println(subartnet->nbDataPerUniverse);
 
-  for (int i = 0; i < dataLen; i += NB_CHANNEL_PER_LED)
-  {
-    size_t ledIdx = i / NB_CHANNEL_PER_LED;
-    ledsPin15[ledIdx] = CRGB(subartnet->data[i], subartnet->data[i + 1], subartnet->data[i + 2]);
-  }
+//   for (int i = 0; i < dataLen; i += NB_CHANNEL_PER_LED)
+//   {
+//     size_t ledIdx = i / NB_CHANNEL_PER_LED;
+//     ledsPin14[ledIdx] = CRGB(subartnet->data[i], subartnet->data[i + 1], subartnet->data[i + 2]);
+//   }
 
-  FastLED.show();
-}
+//   FastLED.show();
+// }
+
+// void artnetCallbackPin15(void *param)
+// {
+//   subArtnet *subartnet = (subArtnet *)param;
+//   auto dataLen = subartnet->len;
+
+//   Serial.println("artnet callback 14: ");
+//   Serial.print("dataLen: ");
+//   Serial.println(dataLen);
+//   Serial.print("Start Universe: ");
+//   Serial.println(subartnet->startUniverse);
+//   Serial.print("End Universe: ");
+//   Serial.println(subartnet->endUniverse);
+//   Serial.print("Universe data size: ");
+//   Serial.println(subartnet->nbDataPerUniverse);
+
+//   for (int i = 0; i < dataLen; i += NB_CHANNEL_PER_LED)
+//   {
+//     size_t ledIdx = i / NB_CHANNEL_PER_LED;
+//     ledsPin15[ledIdx] = CRGB(subartnet->data[i], subartnet->data[i + 1], subartnet->data[i + 2]);
+//   }
+
+//   FastLED.show();
+// }
 
 void setup() {
   Serial.begin(115200);
 
   ledsPin14 = new CRGB[NUMBER_OF_LEDS];
   ledsPin15 = new CRGB[NUMBER_OF_LEDS];
+
   FastLED.addLeds<WS2812B, 14, GRB>(ledsPin14, NUMBER_OF_LEDS);
   FastLED.addLeds<WS2812B, 15, GRB>(ledsPin14, NUMBER_OF_LEDS);
 
@@ -92,25 +101,13 @@ void setup() {
   ETH.config(IPAddress(192, 168, 1, 10), IPAddress(192, 168, 1, 1), IPAddress(255, 255, 255, 0));
   ETH.setHostname("obelisk-control-board-1");
 
-  // reciever size (NUM_LEDS * 3), NUM_LEDS = 144*6
-  // 12 universes of data?
-  uint32_t data_size = (170 * 3) * 12;
+  artnet.begin();
 
-  // Universes 1-6 go to GPIO pin 14
-  artnet.addSubArtnet(1, 369 * 16 * 3, 170 * 3 ,&artnetCallbackPin14);
-
-  // // Universes 7 - 12 go to GPIO pin 15
-  // artnet.addSubArtnet(7, data_size, UNIVERSE_SIZE_IN_CHANNEL ,&artnetCallbackPin15);
-
-  artnet.setNodeName("SIGMA v4.20 OBAMA SIGNATURE EDITION (brain smoothed firmware v666)");
-
-  if (artnet.listen(6454)) 
-  {
-      Serial.print("artnet Listening on IP: ");
-      Serial.println(ETH.localIP()); 
-  }
+  artnet.forwardArtDmxDataToFastLED(1, ledsPin14, NUMBER_OF_LEDS);
+  artnet.forwardArtDmxDataToFastLED(2, ledsPin15, NUMBER_OF_LEDS);
 }
 
 void loop() {
-  vTaskDelete(NULL);
+  artnet.parse(); // check if artnet packet has come and execute callback
+  FastLED.show();
 }
