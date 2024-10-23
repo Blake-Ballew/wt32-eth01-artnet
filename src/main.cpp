@@ -4,13 +4,13 @@
 
 #define NUM_LEDS_PER_STRIP 144 // Modulight V3 Spec
 #define NUMSTRIPS 12 // 12 per controller
-#define NUMSTRIPS_PER_PIN 6 
+#define NUMSTRIPS_PER_PIN 1
 #define NB_CHANNEL_PER_LED 3 //Should be 4 if your sending tool is sending RGBW
 #define UNIVERSE_SIZE_IN_CHANNEL  (NUM_LEDS_PER_STRIP * 3)  //here we define a universe of 170 pixels each pixel is composed of 3 channels
 #define START_UNIVERSE 0 // Prefered for MadMapper
 
-#define NUMBER_OF_LEDS 144 * 6
-#define NB_LEDS_PER_UNIVERSE 170
+#define NUMBER_OF_LEDS 144 * NUMSTRIPS_PER_PIN
+#define NB_LEDS_PER_UNIVERSE 144
 #define START_UNIVERSE 1
 
 #include "artnetESP32V2.h"
