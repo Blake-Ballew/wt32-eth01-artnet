@@ -4,8 +4,9 @@
 
 #define NUM_LEDS_PER_STRIP 144 // Modulight V3 Spec
 #define NUMSTRIPS 12 // 12 per controller
+#define NUMSTRIPS_PER_PIN 6 
 #define NB_CHANNEL_PER_LED 3 //Should be 4 if your sending tool is sending RGBW
-#define UNIVERSE_SIZE_IN_CHANNEL  (170 * 3)  //here we define a universe of 170 pixels each pixel is composed of 3 channels
+#define UNIVERSE_SIZE_IN_CHANNEL  (NUM_LEDS_PER_STRIP * 3)  //here we define a universe of 170 pixels each pixel is composed of 3 channels
 #define START_UNIVERSE 0 // Prefered for MadMapper
 
 #define NUMBER_OF_LEDS 144 * 6
@@ -92,7 +93,7 @@ void setup() {
   ETH.setHostname("obelisk-control-board-1");
 
   // reciever size (NUM_LEDS * 3), NUM_LEDS = 144*6
-  uint32_t data_size = UNIVERSE_SIZE_IN_CHANNEL * 6;
+  uint32_t data_size = UNIVERSE_SIZE_IN_CHANNEL * NUMSTRIPS_PER_PIN;
 
   // Universes 1-6 go to GPIO pin 14
   artnet.addSubArtnet(1, data_size, UNIVERSE_SIZE_IN_CHANNEL ,&artnetCallbackPin14);
