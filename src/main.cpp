@@ -48,6 +48,7 @@ void setup() {
   }
 
   ETH.config(IPAddress(192, 168, 1, 10), IPAddress(192, 168, 1, 1), IPAddress(255, 255, 255, 0));
+  ETH.setHostname("obelisk-control-board-1");
 
   artnet.addSubArtnet(START_UNIVERSE, NUMBER_OF_LEDS * NB_CHANNEL_PER_LED,UNIVERSE_SIZE_IN_CHANNEL ,&artnetCallback);
   artnet.setNodeName("Arnet Node esp32");
