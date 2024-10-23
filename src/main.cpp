@@ -27,6 +27,16 @@ void artnetCallbackPin14(void *param)
   subArtnet *subartnet = (subArtnet *)param;
   auto dataLen = subartnet->len;
 
+  Serial.println("artnet callback 14: ");
+  Serial.print("dataLen: ");
+  Serial.println(dataLen);
+  Serial.print("Start Universe: ");
+  Serial.println(subartnet->startUniverse);
+  Serial.print("End Universe: ");
+  Serial.println(subartnet->endUniverse);
+  Serial.print("Universe data size: ");
+  Serial.println(subartnet->nbDataPerUniverse);
+
   for (int i = 0; i < dataLen; i += NB_CHANNEL_PER_LED)
   {
     size_t ledIdx = i / NB_CHANNEL_PER_LED;
@@ -40,6 +50,16 @@ void artnetCallbackPin15(void *param)
 {
   subArtnet *subartnet = (subArtnet *)param;
   auto dataLen = subartnet->len;
+
+  Serial.println("artnet callback 14: ");
+  Serial.print("dataLen: ");
+  Serial.println(dataLen);
+  Serial.print("Start Universe: ");
+  Serial.println(subartnet->startUniverse);
+  Serial.print("End Universe: ");
+  Serial.println(subartnet->endUniverse);
+  Serial.print("Universe data size: ");
+  Serial.println(subartnet->nbDataPerUniverse);
 
   for (int i = 0; i < dataLen; i += NB_CHANNEL_PER_LED)
   {
