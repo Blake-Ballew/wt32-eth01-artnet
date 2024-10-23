@@ -36,17 +36,18 @@ void setup() {
 
   leds = new CRGB[NUMBER_OF_LEDS];
   FastLED.addLeds<WS2812B, 14, GRB>(leds, NUMBER_OF_LEDS);
-  // ETH.config(IPAddress(192, 168, 1, 250), IPAddress(192, 168, 1, 1), IPAddress(255, 255, 255, 0));
 
   if (!ETH.begin(1, 16, 23, 18, ETH_PHY_LAN8720))
   {
     Serial.println("Failed to start ETH");
-    while (true) {
-      delay(1000);
+    while (true) 
+    {
+      delay(10000);
+      ESP.restart();
     }
   }
 
-  
+  ETH.config(IPAddress(192, 168, 1, 10), IPAddress(192, 168, 1, 1), IPAddress(255, 255, 255, 0));
 
   artnet.addSubArtnet(START_UNIVERSE, NUMBER_OF_LEDS * NB_CHANNEL_PER_LED,UNIVERSE_SIZE_IN_CHANNEL ,&artnetCallback);
   artnet.setNodeName("Arnet Node esp32");
