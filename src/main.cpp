@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "I2SClocklessLedDriver.h"
+#include <FastLED.h>
 #include <ETH.h>
 
 #define NUMBER_OF_LEDS 170
@@ -12,20 +12,31 @@
 
 artnetESP32V2 artnet;
 
-I2SClocklessLedDriver driver;
-int pins[]={14};
+CRGB *leds;
+
+// I2SClocklessLedDriver driver;
+// int pins[]={14};
 
 void artnetCallback(void *param)
 {
   subArtnet *subartnet = (subArtnet *)param;
-  driver.showPixels(NO_WAIT,subartnet->data);
+  auto dataLen = subartnet->len;
+
+  for (int i = 0; i < dataLen; i += NB_CHANNEL_PER_LED)
+  {
+    size_t ledIdx = i / NB_CHANNEL_PER_LED;
+    leds[ledIdx] = CRGB(subartnet->data[i], subartnet->data[i + 1], subartnet->data[i + 2]);
+  }
+
+  FastLED.show();
 }
 
 void setup() {
   Serial.begin(115200);
 
-  driver.initled(NULL,pins,NUMSTRIPS,NUM_LEDS_PER_STRIP);  
-  driver.setBrightness(20);
+  leds = new CRGB[NUMBER_OF_LEDS];
+  FastLED.addLeds<WS2812B, 14, GRB>(leds, NUMBER_OF_LEDS);
+  // ETH.config(IPAddress(192, 168, 1, 250), IPAddress(192, 168, 1, 1), IPAddress(255, 255, 255, 0));
 
   if (!ETH.begin(1, 16, 23, 18, ETH_PHY_LAN8720))
   {
@@ -35,7 +46,9 @@ void setup() {
     }
   }
 
-  artnet.addSubArtnet(START_UNIVERSE ,NUM_LEDS_PER_STRIP * NUMSTRIPS * NB_CHANNEL_PER_LED,UNIVERSE_SIZE_IN_CHANNEL ,&artnetCallback);
+  
+
+  artnet.addSubArtnet(START_UNIVERSE, NUMBER_OF_LEDS * NB_CHANNEL_PER_LED,UNIVERSE_SIZE_IN_CHANNEL ,&artnetCallback);
   artnet.setNodeName("Arnet Node esp32");
 
   if (artnet.listen(6454)) 
