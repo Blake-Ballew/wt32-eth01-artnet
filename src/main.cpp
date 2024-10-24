@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include <FastLED.h>
-#include <ETH.h>
 #include <ArtnetETH.h>
 
 #define NUM_LEDS_PER_STRIP 144 // Modulight V3 Spec
@@ -12,72 +11,18 @@
 
 #define NUMBER_OF_LEDS 144 * NUMSTRIPS_PER_PIN
 #define NB_LEDS_PER_UNIVERSE 144
-#define START_UNIVERSE 1
-
-// #include "artnetESP32V2.h"
-
-// artnetESP32V2 artnet;
 
 ArtnetReceiver artnet;
 
 CRGB *ledsPin14;
 CRGB *ledsPin15;
 
-// I2SClocklessLedDriver driver;
-// int pins[]={14};
+
 
 void artnetCallback(const uint8_t *data, uint16_t size, const ArtDmxMetadata &metadata, const ArtNetRemoteInfo &remote)
 {
 
 }
-
-// void artnetCallbackPin14(void *param)
-// {
-//   subArtnet *subartnet = (subArtnet *)param;
-//   auto dataLen = subartnet->len;
-
-//   Serial.println("artnet callback 14: ");
-//   Serial.print("dataLen: ");
-//   Serial.println(dataLen);
-//   Serial.print("Start Universe: ");
-//   Serial.println(subartnet->startUniverse);
-//   Serial.print("End Universe: ");
-//   Serial.println(subartnet->endUniverse);
-//   Serial.print("Universe data size: ");
-//   Serial.println(subartnet->nbDataPerUniverse);
-
-//   for (int i = 0; i < dataLen; i += NB_CHANNEL_PER_LED)
-//   {
-//     size_t ledIdx = i / NB_CHANNEL_PER_LED;
-//     ledsPin14[ledIdx] = CRGB(subartnet->data[i], subartnet->data[i + 1], subartnet->data[i + 2]);
-//   }
-
-//   FastLED.show();
-// }
-
-// void artnetCallbackPin15(void *param)
-// {
-//   subArtnet *subartnet = (subArtnet *)param;
-//   auto dataLen = subartnet->len;
-
-//   Serial.println("artnet callback 14: ");
-//   Serial.print("dataLen: ");
-//   Serial.println(dataLen);
-//   Serial.print("Start Universe: ");
-//   Serial.println(subartnet->startUniverse);
-//   Serial.print("End Universe: ");
-//   Serial.println(subartnet->endUniverse);
-//   Serial.print("Universe data size: ");
-//   Serial.println(subartnet->nbDataPerUniverse);
-
-//   for (int i = 0; i < dataLen; i += NB_CHANNEL_PER_LED)
-//   {
-//     size_t ledIdx = i / NB_CHANNEL_PER_LED;
-//     ledsPin15[ledIdx] = CRGB(subartnet->data[i], subartnet->data[i + 1], subartnet->data[i + 2]);
-//   }
-
-//   FastLED.show();
-// }
 
 void setup() {
   Serial.begin(115200);
